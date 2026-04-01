@@ -1,0 +1,10 @@
+spring:
+    application:
+        name: inicio
+
+    profiles:
+        #active: ${PROFILE} #Aqui tengo que averiguar como ponerlas en el sistema xd
+        active: test
+
+server:
+    port: 8082

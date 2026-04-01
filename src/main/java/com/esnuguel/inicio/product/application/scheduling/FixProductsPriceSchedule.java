@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class FixProductsPriceSchedule {
-
+    /* 
     private final ProductoRepository productoRepository;
 
     @Scheduled(fixedRate = 600000) //cada 600  seg se ejecuta esto :v
@@ -25,6 +25,6 @@ public class FixProductsPriceSchedule {
         log.info("Finished products ptice");
     }
 
-    
+    */
 
 }

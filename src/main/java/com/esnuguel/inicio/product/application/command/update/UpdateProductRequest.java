@@ -2,7 +2,7 @@ package com.esnuguel.inicio.product.application.command.update;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.esnuguel.inicio.common.mediator.Request;
+import com.esnuguel.inicio.common.application.mediator.Request;
 
 import lombok.Data;
 

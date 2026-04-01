@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.esnuguel.inicio.common.mediator.Mediator;
+import com.esnuguel.inicio.common.application.mediator.Mediator;
+import com.esnuguel.inicio.common.domain.PaginationQuery;
+import com.esnuguel.inicio.common.domain.PaginationResult;
 import com.esnuguel.inicio.product.application.command.create.CreateProductRequest;
+import com.esnuguel.inicio.product.application.command.create.CreateProductResponse;
 import com.esnuguel.inicio.product.application.command.delete.DeleteProductRequest;
 import com.esnuguel.inicio.product.application.command.update.UpdateProductRequest;
 import com.esnuguel.inicio.product.application.query.getAll.GetAllProductRequest;
@@ -50,15 +53,26 @@ public class ProductController implements ProductApi {
 
     @Operation(summary = "Get all products")
     @GetMapping("")
-    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam(required = false) String pageSize){
+    public ResponseEntity<PaginationResult<ProductDto>> getAllProducts(
+        @RequestParam(defaultValue = "0") int pageNumber, 
+        @RequestParam(defaultValue = "5") int pageSize,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDirection
+    ){
         log.info("Getting all products");
-        GetAllProductResponse response=mediator.dispatch(new GetAllProductRequest());
-        List<ProductDto> productsDto=response.getProducts().stream().map(productMapper::mapToProductDto).toList();
-        log.info("Found {} prodcuts",productsDto.size());
+        GetAllProductResponse response=mediator.dispatch(new GetAllProductRequest(new PaginationQuery(pageNumber, pageSize, sortBy, sortDirection)));
+        PaginationResult<Product> productsPage= response.getProductsPage();
 
-        //Cacheo de info esta dentro de el repo
+        PaginationResult<ProductDto> productDtoPaginationResult= 
+        new PaginationResult<>
+        (productsPage.getContent().stream().map(productMapper::mapToProductDto).toList(), 
+        productsPage.getPage(), 
+        productsPage.getSize(), 
+        productsPage.getTotalPages(), 
+        productsPage.getTotalElements()
+        );
 
-        return ResponseEntity.ok(productsDto);
+        return ResponseEntity.ok(productDtoPaginationResult);
     }
 
     @Operation(summary = "Get product by id",description = "Get product by id xd")
@@ -72,8 +86,9 @@ public class ProductController implements ProductApi {
     @PostMapping("")
     public ResponseEntity<Void> saveProduct(@ModelAttribute @Valid CreateProductDto productDto){
         CreateProductRequest request = productMapper.mapToCreateProductRequest(productDto);
-        mediator.dispatch(request);
-        return ResponseEntity.created(URI.create("/api/v1/products/".concat(productDto.getId().toString()))).build();
+        CreateProductResponse response=mediator.dispatch(request);
+        Product product=response.getProduct();
+        return ResponseEntity.created(URI.create("/api/v1/products/".concat(product.getId().toString()))).build();
     }
 
     @PutMapping("")

@@ -6,12 +6,18 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.esnuguel.inicio.common.domain.PaginationQuery;
+import com.esnuguel.inicio.common.domain.PaginationResult;
 import com.esnuguel.inicio.product.domain.entity.Product;
 import com.esnuguel.inicio.product.domain.port.ProductoRepository;
 import com.esnuguel.inicio.product.infrestructure.database.entity.ProductEntity;
 import com.esnuguel.inicio.product.infrestructure.database.mapper.ProductEntityMapper;
+import com.esnuguel.inicio.product.infrestructure.database.repository.QueryProductRepository;
 
 import lombok.RequiredArgsConstructor;
 //Esta clase es la implementacion para usar en una base de datos bajo el contrato de producto Repository
@@ -21,33 +27,43 @@ import lombok.RequiredArgsConstructor;
 
 public class ProductRepositoryImpl implements ProductoRepository{
 
-    private final List<ProductEntity> products= new ArrayList<>();
+    private final QueryProductRepository repository;
 
     private final ProductEntityMapper productEntityMapper;
 
 
     @Override
-    public void uppsert(Product product) {
+    public Product uppsert(Product product) {
         ProductEntity productEntity=productEntityMapper.mapToProductEntity(product);
-        products.removeIf(p->p.getId().equals(product.getId()));
-        products.add(productEntity);
+        ProductEntity save =repository.save(productEntity);
+        return productEntityMapper.mapToProduct(save);
     }
 
     @Cacheable(value = "productos",key = "#id")
     @Override
     public Optional<Product> findById(Long id) {
-        return products.stream().filter(p-> p.getId().equals(id)).findFirst().map(productEntityMapper::mapToProduct);
+        return repository.findById(id).map(productEntityMapper::mapToProduct);
     }
 
     @Override
-    public List<Product> findAll() {
-        return products.stream().map(productEntityMapper::mapToProduct).toList();
+    public PaginationResult<Product> findAll(PaginationQuery paginationQuery) {
+        PageRequest pageRequest=PageRequest.of(paginationQuery.getPage(), paginationQuery.getSize(),
+        Sort.by(Sort.Direction.fromString(paginationQuery.getSortDirection()),paginationQuery.getSortBy()));
+        
+        Page<ProductEntity> page=repository.findAll(pageRequest);
+
+        return new PaginationResult<>(
+            page.getContent().stream().map(productEntityMapper::mapToProduct).toList(),
+            page.getNumber(), 
+            page.getSize(), 
+            page.getTotalPages(), 
+            page.getTotalElements());
     }
 
     @Override
     @CacheEvict(value = "productos",key = "#id")
     public void deleteById(Long id) {
-        products.removeIf(p->p.getId().equals(id));
+        repository.deleteById(id);
     }
 
 }

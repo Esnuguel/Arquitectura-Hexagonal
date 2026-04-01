@@ -6,11 +6,12 @@ import lombok.Data;
 
 import java.util.List;
 
+import com.esnuguel.inicio.common.domain.PaginationResult;
 import com.esnuguel.inicio.product.domain.entity.Product;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class GetAllProductResponse {
-    private List<Product> products;
+    private PaginationResult<Product> productsPage;
 }

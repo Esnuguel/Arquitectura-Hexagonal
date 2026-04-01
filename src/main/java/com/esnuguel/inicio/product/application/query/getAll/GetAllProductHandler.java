@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.esnuguel.inicio.common.mediator.RequestHandler;
+import com.esnuguel.inicio.common.application.mediator.RequestHandler;
+import com.esnuguel.inicio.common.domain.PaginationResult;
 import com.esnuguel.inicio.product.domain.entity.Product;
 import com.esnuguel.inicio.product.domain.port.ProductoRepository;
 
@@ -22,7 +23,7 @@ public class GetAllProductHandler implements RequestHandler<GetAllProductRequest
 
     @Override
     public GetAllProductResponse handle(GetAllProductRequest request) {
-        List<Product> products=productoRepository.findAll();
+        PaginationResult<Product> products=productoRepository.findAll(request.getPaginationQuery());
         return new GetAllProductResponse(products);
     }
     

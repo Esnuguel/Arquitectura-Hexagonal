@@ -3,14 +3,16 @@ package com.esnuguel.inicio.product.domain.port;
 import java.util.List;
 import java.util.Optional;
 
+import com.esnuguel.inicio.common.domain.PaginationQuery;
+import com.esnuguel.inicio.common.domain.PaginationResult;
 import com.esnuguel.inicio.product.domain.entity.Product;
 
 public interface ProductoRepository {
-    void uppsert(Product product);
+    Product uppsert(Product product);
 
     Optional<Product> findById(Long id);
 
-    List<Product> findAll();
+    PaginationResult<Product> findAll(PaginationQuery paginationQuery);
 
     void deleteById(Long id);
 }

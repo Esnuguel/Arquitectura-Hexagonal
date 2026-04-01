@@ -11,6 +11,7 @@ import com.esnuguel.inicio.product.infrestructure.api.dto.CreateProductDto;
 import com.esnuguel.inicio.product.infrestructure.api.dto.ProductDto;
 import com.esnuguel.inicio.product.infrestructure.api.dto.UpdateProductDto;
 
+
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR )
 public interface ProductMapper {
     CreateProductRequest mapToCreateProductRequest(CreateProductDto createProductoDto);

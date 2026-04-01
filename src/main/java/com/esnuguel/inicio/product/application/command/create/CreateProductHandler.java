@@ -12,16 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.esnuguel.inicio.common.mediator.RequestHandler;
-import com.esnuguel.inicio.common.util.FileUtils;
+import com.esnuguel.inicio.common.application.mediator.RequestHandler;
+import com.esnuguel.inicio.common.infrastructure.util.FileUtils;
 import com.esnuguel.inicio.product.domain.entity.Product;
 import com.esnuguel.inicio.product.domain.port.ProductoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-public class CreateProductHandler implements RequestHandler<CreateProductRequest,Void>{
+@Slf4j
+public class CreateProductHandler implements RequestHandler<CreateProductRequest,CreateProductResponse>{
 
     private final ProductoRepository productRepository;    
     private final FileUtils fileUtils;
@@ -32,7 +34,7 @@ public class CreateProductHandler implements RequestHandler<CreateProductRequest
     }
 
     @Override
-    public Void handle(CreateProductRequest request) {
+    public CreateProductResponse handle(CreateProductRequest request) {
         String uniqueFileName=fileUtils.saveProductImage(request.getFile());
         
         Product product= Product.builder()
@@ -40,10 +42,11 @@ public class CreateProductHandler implements RequestHandler<CreateProductRequest
             .name(request.getName())
             .price(request.getPrice())
             .image(uniqueFileName)
-            .id(request.getId())
             .build();
-        productRepository.uppsert(product);
-        return null;
+        Product storedProduct=productRepository.uppsert(product);
+        log.info("Proucto creado con el id: "+storedProduct.getId());
+    
+        return new CreateProductResponse(storedProduct);
     }
     
 }

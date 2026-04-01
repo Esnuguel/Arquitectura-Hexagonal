@@ -2,8 +2,8 @@ package com.esnuguel.inicio.product.application.command.update;
 
 import org.springframework.stereotype.Service;
 
-import com.esnuguel.inicio.common.mediator.RequestHandler;
-import com.esnuguel.inicio.common.util.FileUtils;
+import com.esnuguel.inicio.common.application.mediator.RequestHandler;
+import com.esnuguel.inicio.common.infrastructure.util.FileUtils;
 import com.esnuguel.inicio.product.domain.entity.Product;
 import com.esnuguel.inicio.product.domain.port.ProductoRepository;
 
